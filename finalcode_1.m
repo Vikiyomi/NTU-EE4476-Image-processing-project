@@ -27,6 +27,8 @@ xt(find(xt>m1)) = m1;%trancate all xt value above m1 to m1
 subplot(2,3,6);
 figure(6); imshow(xt, []);
 title('figure(6)'); 
+
+%segment the background mask
 m2 = mean(mean(xt));
 xt(find(xt>m2)) = m2;
 %figure(7); 
@@ -41,13 +43,14 @@ figure(8);
 imshow(xt, []);
 title('figure(8)');
 
+%perform erosion to remove the branch but leave the noise
 se3 = strel('disk',4);             
 xmask = imerode(xt,se3);
 figure(9);
 imshow(xmask, []);
 title('figure(9)');
 
-n = sum(sum(xt)); %number of pixel of retina image within the circle %circle ??pixel??
+n = sum(sum(xt)); %number of pixel of retina image within the circle
 %Segment the vessel
 xin = xg.*xmask;  %original image within circle = 1
 xout = xin; 
@@ -64,19 +67,19 @@ end
 D=medfilt2(D);
 figure(99); imshow(D, []);title('dilate1');
 
-xout=(D-xout)*5;
+xout=(D-xout)*5; %image minus noise
 figure(100); imshow(xout, []);title('dif');
 
-xedge = edge(xout,'Canny',0.9);xa=uint8(xedge);
+xedge = edge(xout,'Canny',0.9);xa=uint8(xedge); %get edge but this is not used in this project
 % figure(10); imshow(xedge, []);title('xedge');
 
-xout=xout.*xmask;
+xout=xout.*xmask; %delete the edge and background
 figure(11); imshow(xout, []);title('substract');
 
 xout=medfilt2(xout);
 figure(21); imshow(xout, []);title('median filter');
 
-xout=im2bw(xout,0.12); %0.12
+xout=im2bw(xout,0.12); %convert to binary image
 xout=uint8(xout);
 xout=xout*255;
 % xout=[xout.*i5];
